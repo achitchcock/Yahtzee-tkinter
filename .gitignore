@@ -1,2 +1,4 @@
 venv/*
 yatzee_screenshot.PNG
+.idea/*.xml
+.idea/*.iml

@@ -17,6 +17,7 @@ LARGE_STRAIGHT = 'Large Straight'
 YAHTZEE = 'Yahtzee'
 CHANCE = 'Chance'
 
+ANIM_CAP = 15
 
 class App(Frame):
     def __init__(self, master):
@@ -34,7 +35,7 @@ class App(Frame):
         self.canvas = Canvas(width=420, height=500, bg='green')
         self.canvas.grid(row=0, column=0, columnspan=2)
 
-        self.buttonFrame = Frame(self.master, bg='red')
+        self.buttonFrame = Frame(self.master)
         self.buttonFrame.grid(row=1, column=1, sticky='news')
 
         self.rollButton = Button(self.buttonFrame, text="Roll Dice", font=('Impact', 30),
@@ -75,9 +76,7 @@ class App(Frame):
     def button_click(self, text):
         if not self.dieRolls:
             return
-        print(text)
         self.buttonCount -= 1
-        print(self.buttonCount)
         self.gameButtons[text].config(state=DISABLED)
         self.scores[text] = self.dieRolls
         self.dieRolls.sort()
@@ -97,24 +96,31 @@ class App(Frame):
         x = 30
         for i in range(5):
             canvas.create_image((x, start), image=self.dieImages[dice[i] - 1])
-            x += 50 + (15 - self.animCount) * 2
+            x += 53
+
+    def displayDiceRoll(self, canvas, dice, start):
+        if len(dice) == 0:
+            return
+        x = 30
+        for i in range(5):
+            canvas.create_image((x, start + random.randint(-10,10)), image=self.dieImages[dice[i] - 1])
+            x += 50 + (ANIM_CAP - self.animCount) * 2
 
     def rollDice(self, start):
-        if self.animCount == 15:
+        if self.animCount == ANIM_CAP:
             self.rollButton.config(state=DISABLED)
-        if self.animCount == 0:
-            self.animCount = 15
-            return
         self.dieRolls = [random.randint(1, 6) for x in range(5)]
-        # print(d)
         if self.animCount == 0:
-            self.animCount = 15
+
+            self.canvas.delete("all")
+            self.displayDiceRoll(self.canvas, self.dieRolls, start)
+            self.animCount = ANIM_CAP
             return
         else:
             self.canvas.delete("all")
-            self.displayDice(self.canvas, self.dieRolls, start)
+            self.displayDiceRoll(self.canvas, self.dieRolls, start)
             self.animCount -= 1
-            self.master.after(120, self.rollDice, start + random.randint(10, 30))
+            self.master.after(60, self.rollDice, start + random.randint(10, 30))
 
     def score_game(self):
         total = 0
